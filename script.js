@@ -11,17 +11,26 @@ let servicePercentPrice;
 let service1;
 let service2;
 
-const isNumber = function (num) {
-    return !isNaN(parseFloat(num)) && isFinite(num);
+const getNumber = function (message) {
+    let value;
+
+    do {
+        value = prompt(message);
+        if (value === null) {
+            return null;
+        }
+
+        value = value.trim();
+    } while (value === "" || !isFinite(value))
+
+    return Number(value);
 }
 
 const asking = function () {
     title = prompt("Как называется ваш проект?", "Калькулятор верстки");
     screens = prompt("Какие типы экранов нужно разработать?", "Простые, Сложные, Интерактивные");
 
-    do {
-        screenPrice = +prompt("Сколько будет стоить данная работа?");
-    } while (!isNumber(screenPrice))
+    screenPrice = getNumber("Сколько будет стоить данная работа?");
 
     adaptive = confirm("Нужен ли адаптив на сайте?");
 }
@@ -37,8 +46,12 @@ const getAllServicePrices = function () {
             service2 = prompt("Какой дополнительный тип услуги нужен?");
         }
 
-        priceService = +prompt("Сколько это будет стоить?");
-        !isNumber(priceService) ? i-- : sum += priceService;
+        priceService = getNumber("Сколько это будет стоить?");
+        if (priceService === null) {
+            i--;
+            continue;
+        }
+        sum += priceService;
     }
 
     return sum;
