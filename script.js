@@ -1,12 +1,9 @@
 console.log("Complecated Second lesson!");
 
 const num = 266219;
-const strNum = String(num);
-let product = 1;
 
-for(let i = 0; i < strNum.length; i++) {
-    product *= Number(strNum[i]);
-}
+let product = String(num).split('').reduce((acc, elem) => acc * Number(elem), 1);
+
 console.log("Произведение цифр числа " + num + ":", product);
 
 const productCubed = product ** 3;
