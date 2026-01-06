@@ -1,204 +1,90 @@
 'use strict';
 
-let title;
-let screens;
-let screenPrice;
-let adaptive;
-let rollback = 10;
-let allServicePrices;
-let fullPrice;
-let servicePercentPrice;
-let service1;
-let service2;
+let appData = {
+    title: "",
+    screens: "",
+    screenPrice: 0,
+    adaptive: false,
+    rollback: 10,
+    allServicePrices: 0,
+    fullPrice: 0,
+    servicePercentPrice: 0,
+    service1: "",
+    service2: "",
+    start: function () {
+        appData.asking();
+        appData.allServicePrices = appData.getAllServicePrices();
+        appData.fullPrice = appData.getFullPrice();
+        appData.servicePercentPrice = appData.getServicePercentPrice();
+        appData.title = appData.getTitle();
 
-const getNumber = function (message) {
-    let value;
-
-    do {
-        value = prompt(message);
-        if (value === null) {
-            return null;
+        appData.logger();
+    },
+    logger: function () {
+        for (let key in appData) {
+            console.log(key + ": " + appData[key]);
         }
+    },
+    asking: function () {
+        appData.title = prompt("Как называется ваш проект?", "Калькулятор верстки");
+        appData.screens = prompt("Какие типы экранов нужно разработать?", "Простые, Сложные, Интерактивные");
+        appData.screenPrice = appData.getNumber("Сколько будет стоить данная работа?");
+        appData.adaptive = confirm("Нужен ли адаптив на сайте?");
+    },
+    getNumber: function (message) {
+        let value;
 
-        value = value.trim();
-    } while (value === "" || !isFinite(value))
-    return Number(value);
-}
-
-const asking = function () {
-    title = prompt("Как называется ваш проект?", "Калькулятор верстки");
-    screens = prompt("Какие типы экранов нужно разработать?", "Простые, Сложные, Интерактивные");
-
-    screenPrice = getNumber("Сколько будет стоить данная работа?");
-
-    adaptive = confirm("Нужен ли адаптив на сайте?");
-}
-
-const getAllServicePrices = function () {
-    let sum = 0;
-    let priceService = 0;
-
-    for (let i = 0; i < 2; i++) {
-        if (i === 0) {
-            service1 = prompt("Какой дополнительный тип услуги нужен?");
-        } else if (i === 1) {
-            service2 = prompt("Какой дополнительный тип услуги нужен?");
-        }
-
-        priceService = getNumber("Сколько это будет стоить?");
-        if (priceService === null) {
-            i--;
-            continue;
-        }
-        sum += priceService;
-    }
-
-    return sum;
-}
-
-const showTypeOf = function (variable) {
-    console.log(variable, typeof variable);
-}
-
-const getFullPrice = function () {
-    return screenPrice + allServicePrices;
-}
-
-const getServicePercentPrice = function () {
-    return fullPrice - (fullPrice * (rollback / 100));
-}
-
-const getTitle = function () {
-    const clearTitle = title.trim();
-    return clearTitle
-        ? clearTitle[0].toUpperCase() + clearTitle.slice(1).toLowerCase()
-        : clearTitle;
-};
-
-const getRollbackMessage = function (price) {
-    if (price >= 30000) {
-        return "Даем скидку в 10%";
-    } else if (price >= 15000 && price < 30000) {
-        return "Даем скидку в 5%";
-    } else if (price < 15000 && price >= 0) {
-        return "Скидка не предусмотрена";
-    } else {
-        return "Что-то пошло не так";
-    }
-}
-
-asking();
-allServicePrices = getAllServicePrices();
-fullPrice = getFullPrice();
-servicePercentPrice = getServicePercentPrice();
-title = getTitle();
-
-showTypeOf(title);
-showTypeOf(screenPrice);
-showTypeOf(adaptive);
-
-console.log("allServicePrices", allServicePrices);
-
-console.log(getRollbackMessage(fullPrice));
-console.log("Стоимсоть верстки экранов " + screenPrice + " юани и Стоимость разработки сайта " + fullPrice + " юани");
-
-/*
-function getNumberGame(value) {
-    if (value === null) {
-        return null;
-    }
-
-    value = value.trim();
-    if (value === "" || !isFinite(value)) {
-        return null;
-    }
-
-    return Number(value);
-}
-
-function createGame() {
-    const numberToGuess = Math.floor(Math.random() * 100) + 1;
-
-    function ask() {
-        const userInput = prompt("Угадай число от 1 до 100");
-
-        if (userInput === null) {
-            alert("Игра окончена");
-            return;
-        }
-        const userNumber = getNumberGame(userInput);
-
-        if (userNumber === null) {
-            alert("Введи число!");
-            return ask();
-        }
-
-        if (userNumber > numberToGuess) {
-            alert("Загаданное число меньше");
-            return ask();
-        }
-
-        if (userNumber < numberToGuess) {
-            alert("Загаданное число больше");
-            return ask();
-        }
-
-        alert("Поздравляю, Вы угадали!!!");
-    }
-
-    return ask;
-}
-
-function createGameWithLimit() {
-    const numberToGuess = Math.floor(Math.random() * 100) + 1;
-    let attempts = 10;
-
-    function ask() {
-        if (attempts === 0) {
-            const playAgain = confirm("Попытки закончились. Хотите сыграть еще?");
-            if (playAgain) {
-                const newGame = createGameWithLimit();
-                newGame();
+        do {
+            value = prompt(message);
+            if (value === null) {
+                return null;
             }
-            return;
+
+            value = value.trim();
+        } while (value === "" || !isFinite(value))
+
+        return Number(value);
+    },
+    getAllServicePrices: function () {
+        let sum = 0;
+        let priceService = 0;
+
+        for (let i = 0; i < 2; i++) {
+            appData[`service${i + 1}`] = prompt("Какой дополнительный тип услуги нужен?");
+
+            priceService = appData.getNumber("Сколько это будет стоить?");
+            if (priceService === null) {
+                i--;
+                continue;
+            }
+            sum += priceService;
         }
 
-        const userInput = prompt("Угадай число от 1 до 100");
-
-        if (userInput === null) {
-            alert("Игра окончена");
-            return;
+        return sum;
+    },
+    getFullPrice: function () {
+        return appData.screenPrice + appData.allServicePrices;
+    },
+    getServicePercentPrice: function () {
+        return appData.fullPrice - (appData.fullPrice * (appData.rollback / 100));
+    },
+    getTitle: function () {
+        const clearTitle = appData.title.trim();
+        return clearTitle
+            ? clearTitle[0].toUpperCase() + clearTitle.slice(1).toLowerCase()
+            : clearTitle;
+    },
+    getRollbackMessage: function (price) {
+        if (price >= 30000) {
+            return "Даем скидку в 10%";
+        } else if (price >= 15000 && price < 30000) {
+            return "Даем скидку в 5%";
+        } else if (price < 15000 && price >= 0) {
+            return "Скидка не предусмотрена";
+        } else {
+            return "Что-то пошло не так";
         }
-        const userNumber = getNumberGame(userInput);
-
-        if (userNumber === null) {
-            alert("Введи число!");
-            return ask();
-        }
-        attempts--;
-
-        if (userNumber > numberToGuess) {
-            alert("Загаданное число меньше, осталось попыток: " + (attempts));
-            return ask();
-        }
-
-        if (userNumber < numberToGuess) {
-            alert("Загаданное число больше, осталось попыток: " + (attempts));
-            return ask();
-        }
-
-        const agree = confirm("Поздравляю, Вы угадали!!! Хотели бы сыграть еще?");
-        if (agree) {
-            const newGame = createGameWithLimit();
-            newGame();
-        }
-    }
-
-    return ask;
+    },
 }
 
-
-// const guessTheNumber = createGame();
-const guessTheNumber = createGameWithLimit();
-guessTheNumber();
-*/
+appData.start();
