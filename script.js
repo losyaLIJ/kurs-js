@@ -50,11 +50,7 @@ let appData = {
         let priceService = 0;
 
         for (let i = 0; i < 2; i++) {
-            if (i === 0) {
-                appData.service1 = prompt("Какой дополнительный тип услуги нужен?");
-            } else if (i === 1) {
-                appData.service2 = prompt("Какой дополнительный тип услуги нужен?");
-            }
+            appData[`service${i + 1}`] = prompt("Какой дополнительный тип услуги нужен?");
 
             priceService = appData.getNumber("Сколько это будет стоить?");
             if (priceService === null) {
