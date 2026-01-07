@@ -1,90 +1,51 @@
 'use strict';
 
-let appData = {
-    title: "",
-    screens: "",
-    screenPrice: 0,
-    adaptive: false,
-    rollback: 10,
-    allServicePrices: 0,
-    fullPrice: 0,
-    servicePercentPrice: 0,
-    service1: "",
-    service2: "",
-    start: function () {
-        appData.asking();
-        appData.allServicePrices = appData.getAllServicePrices();
-        appData.fullPrice = appData.getFullPrice();
-        appData.servicePercentPrice = appData.getServicePercentPrice();
-        appData.title = appData.getTitle();
+const weekdays = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье'];
+const months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+const declensions = {
+    hours: ['час', 'часа', 'часов'],
+    minutes: ['минута', 'минуты', 'минут'],
+    seconds: ['секунда', 'секунды', 'секунд']
+};
 
-        appData.logger();
-    },
-    logger: function () {
-        for (let key in appData) {
-            console.log(key + ": " + appData[key]);
-        }
-    },
-    asking: function () {
-        appData.title = prompt("Как называется ваш проект?", "Калькулятор верстки");
-        appData.screens = prompt("Какие типы экранов нужно разработать?", "Простые, Сложные, Интерактивные");
-        appData.screenPrice = appData.getNumber("Сколько будет стоить данная работа?");
-        appData.adaptive = confirm("Нужен ли адаптив на сайте?");
-    },
-    getNumber: function (message) {
-        let value;
+const formatA = document.getElementById('formatA');
+const formatB = document.getElementById('formatB');
 
-        do {
-            value = prompt(message);
-            if (value === null) {
-                return null;
-            }
+function getWordForm(value, words) {
+    if (value <= 0) return words[2]
+    value = Math.abs(value) % 100
+    const lastNum = value % 10
 
-            value = value.trim();
-        } while (value === "" || !isFinite(value))
+    if (value > 10 && value < 20) return words[2]
+    if (lastNum === 1) return words[0]
+    if (lastNum >= 2 && lastNum <= 4) return words[1]
 
-        return Number(value);
-    },
-    getAllServicePrices: function () {
-        let sum = 0;
-        let priceService = 0;
-
-        for (let i = 0; i < 2; i++) {
-            appData[`service${i + 1}`] = prompt("Какой дополнительный тип услуги нужен?");
-
-            priceService = appData.getNumber("Сколько это будет стоить?");
-            if (priceService === null) {
-                i--;
-                continue;
-            }
-            sum += priceService;
-        }
-
-        return sum;
-    },
-    getFullPrice: function () {
-        return appData.screenPrice + appData.allServicePrices;
-    },
-    getServicePercentPrice: function () {
-        return appData.fullPrice - (appData.fullPrice * (appData.rollback / 100));
-    },
-    getTitle: function () {
-        const clearTitle = appData.title.trim();
-        return clearTitle
-            ? clearTitle[0].toUpperCase() + clearTitle.slice(1).toLowerCase()
-            : clearTitle;
-    },
-    getRollbackMessage: function (price) {
-        if (price >= 30000) {
-            return "Даем скидку в 10%";
-        } else if (price >= 15000 && price < 30000) {
-            return "Даем скидку в 5%";
-        } else if (price < 15000 && price >= 0) {
-            return "Скидка не предусмотрена";
-        } else {
-            return "Что-то пошло не так";
-        }
-    },
+    return words[2]
 }
 
-appData.start();
+function addLeadingZero(num) {
+    return num < 10 ? '0' + num : num;
+}
+
+function updateClock() {
+    const now = new Date();
+    const day = now.getDate();
+    const month = now.getMonth();
+    const year = now.getFullYear();
+    const weekday = now.getDay() === 0 ? 6 : now.getDay() - 1;
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+    const seconds = now.getSeconds();
+
+    formatA.textContent = 'Сегодня ' + weekdays[weekday] + ', '
+        + day + ' ' + months[month] + ' ' + year + ' года, '
+        + hours + ' ' + getWordForm(hours, declensions.hours) + ' '
+        + minutes + ' ' + getWordForm(minutes, declensions.minutes) + ' '
+        + seconds + ' ' + getWordForm(seconds, declensions.seconds);
+
+    formatB.textContent = addLeadingZero(day) + '.' + addLeadingZero(month + 1) + '.' + year
+        + ' - ' + addLeadingZero(hours) + ':' + addLeadingZero(minutes) + ':' + addLeadingZero(seconds);
+}
+
+updateClock();
+setInterval(updateClock, 1000);
