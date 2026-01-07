@@ -2,75 +2,83 @@
 
 let appData = {
     title: "",
-    screens: "",
+    screens: [],
     screenPrice: 0,
     adaptive: false,
     rollback: 10,
     allServicePrices: 0,
     fullPrice: 0,
     servicePercentPrice: 0,
-    service1: "",
-    service2: "",
+    services: [],
     start: function () {
         appData.asking();
-        appData.allServicePrices = appData.getAllServicePrices();
-        appData.fullPrice = appData.getFullPrice();
-        appData.servicePercentPrice = appData.getServicePercentPrice();
-        appData.title = appData.getTitle();
+        appData.addPrices();
+        appData.getFullPrice();
+        appData.getServicePercentPrice();
+        appData.getTitle();
 
         appData.logger();
     },
     logger: function () {
-        for (let key in appData) {
-            console.log(key + ": " + appData[key]);
-        }
+        console.log(appData.fullPrice);
+        console.log(appData.servicePercentPrice);
+    },
+    isNumber: function (value) {
+        return !isNaN(parseFloat(value)) && isFinite(value);
+    },
+    isText: function (value) {
+        return value !== null && value.trim() !== '' && isNaN(value.trim());
     },
     asking: function () {
-        appData.title = prompt("Как называется ваш проект?", "Калькулятор верстки");
-        appData.screens = prompt("Какие типы экранов нужно разработать?", "Простые, Сложные, Интерактивные");
-        appData.screenPrice = appData.getNumber("Сколько будет стоить данная работа?");
-        appData.adaptive = confirm("Нужен ли адаптив на сайте?");
-    },
-    getNumber: function (message) {
-        let value;
-
         do {
-            value = prompt(message);
-            if (value === null) {
-                return null;
-            }
-
-            value = value.trim();
-        } while (value === "" || !isFinite(value))
-
-        return Number(value);
-    },
-    getAllServicePrices: function () {
-        let sum = 0;
-        let priceService = 0;
+            appData.title = prompt("Как называется ваш проект?", "Калькулятор верстки");
+        } while (!appData.isText(appData.title));
 
         for (let i = 0; i < 2; i++) {
-            appData[`service${i + 1}`] = prompt("Какой дополнительный тип услуги нужен?");
+            let name = "";
+            let price = 0;
 
-            priceService = appData.getNumber("Сколько это будет стоить?");
-            if (priceService === null) {
-                i--;
-                continue;
-            }
-            sum += priceService;
+            do {
+                name = prompt("Какие типы экранов нужно разработать?");
+            } while (!appData.isText(name));
+
+            do {
+                price = prompt("Сколько будет стоить данная работа?");
+            } while (!appData.isNumber(price));
+
+            appData.screens.push({ id: i, name, price });
         }
 
-        return sum;
+        for (let i = 0; i < 2; i++) {
+            let name = "";
+            let price = 0;   
+
+            do {
+                name = prompt("Какой дополнительный тип услуги нужен?");
+            } while (!appData.isText(name));
+            
+            do {
+                price = prompt("Сколько это будет стоить?");
+            } while (!appData.isNumber(price));
+
+            appData.services.push({ id: i, name, price });
+        }
+
+        appData.adaptive = confirm("Нужен ли адаптив на сайте?");
+    },
+    addPrices: function () {
+        appData.screenPrice = appData.screens.reduce((sum, screen) => sum + +screen.price, 0);
+        appData.allServicePrices = appData.services.reduce((sum, service) => sum + +service.price, 0);
     },
     getFullPrice: function () {
-        return appData.screenPrice + appData.allServicePrices;
+        appData.fullPrice = appData.screenPrice + appData.allServicePrices;
     },
     getServicePercentPrice: function () {
-        return appData.fullPrice - (appData.fullPrice * (appData.rollback / 100));
+        appData.servicePercentPrice = appData.fullPrice - (appData.fullPrice * (appData.rollback / 100));
     },
     getTitle: function () {
         const clearTitle = appData.title.trim();
-        return clearTitle
+        appData.title = clearTitle
             ? clearTitle[0].toUpperCase() + clearTitle.slice(1).toLowerCase()
             : clearTitle;
     },
