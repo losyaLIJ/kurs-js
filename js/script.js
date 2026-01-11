@@ -153,8 +153,6 @@ let appData = {
         }, 0)
 
         totalCountRollback.value = Math.round(appData.servicePercentPrice)
-
-        console.log(appData.rollback);
     }
 }
 
